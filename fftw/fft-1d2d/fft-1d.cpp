@@ -6,10 +6,6 @@
 #include <fftw3.h>
 #include <complex.h>
 
-#define WID 4096
-#define HEI 4096
-
-
 double getrusage_sec()
 {
     struct rusage t;
@@ -26,15 +22,15 @@ int main(){
 
     double starttime1,endtime1;
     double starttime2,endtime2;
-    double starttime3,endtime3;
-    double starttime4,endtime4;
-
 
 
     FILE *fp;
     FILE *fp1;
     FILE *fp2;
     int i,j,k;
+
+    int WID,HEI;
+    char filename[20] = {};
 
 
 
@@ -44,10 +40,19 @@ int main(){
     double f;
 
 
+    printf("please input a number of width  :  ");
+    scanf("%d",&WID);
+
+    printf("please input a number of heith  :  ");
+    scanf("%d",&HEI);
+
+    printf("please input a filename  :  ");
+    scanf("%s",filename);
+
 
 // ファイル読み込み
 
-    fp=fopen("data2000.txt","r");
+    fp=fopen(filename,"r");
     if(fp==NULL){
       printf("file open error¥n");
     }
@@ -62,7 +67,6 @@ int main(){
          printf("file read error\n");
        }
         ibuf[i][0] = f;
-        //printf("%lf\n",ibuf[i][0]);
         ibuf[i][1] = 0.0;
     }
     fclose(fp);
@@ -81,10 +85,6 @@ int main(){
     fftw_destroy_plan(plan);
 
     }
-
-    endtime1 = getrusage_sec();
-
-    printf("Calculation time is %lf\n",endtime1-starttime1);
 
 
 
@@ -108,8 +108,6 @@ int main(){
 //FFT縦
 
 
-    starttime2 = getrusage_sec();
-
     for(i=0;i<WID;i++){
 
     plan = fftw_plan_dft_1d(WID, &tbuf[i*WID], &obuf[i*WID], FFTW_FORWARD, FFTW_ESTIMATE);
@@ -117,10 +115,6 @@ int main(){
     fftw_destroy_plan(plan);
 
     }
-
-    endtime2 = getrusage_sec();
-
-    printf("Calculation time is %lf\n",endtime2-starttime2);
 
 
 //入れ替え
@@ -136,6 +130,11 @@ int main(){
     }
 
   }
+
+    endtime1 = getrusage_sec();
+
+    printf("Calculation time is %lf\n",endtime1-starttime1);
+
 
 
     fp1=fopen("ffta-1d.txt","w");
@@ -158,7 +157,7 @@ int main(){
 
 //IFFT横
 
-    starttime3 = getrusage_sec();
+    starttime2 = getrusage_sec();
 
 
     for(i=0;i<WID;i++){
@@ -168,10 +167,6 @@ int main(){
     fftw_destroy_plan(plan);
 
     }
-
-    endtime3 = getrusage_sec();
-
-    printf("Calculation time is %lf\n",endtime3-starttime3);
 
 
 //入れ替え
@@ -191,8 +186,6 @@ int main(){
 
 //IFFT縦
 
-    starttime4 = getrusage_sec();
-
     for(i=0;i<WID;i++){
 
     plan = fftw_plan_dft_1d(WID, &tbuf[i*WID], &ibuf[i*WID], FFTW_BACKWARD, FFTW_ESTIMATE);
@@ -200,10 +193,6 @@ int main(){
     fftw_destroy_plan(plan);
 
     }
-
-    endtime4 = getrusage_sec();
-
-    printf("Calculation time is %lf\n",endtime4-starttime4);
 
 
     for(k=0;k<2;k++){
@@ -217,6 +206,11 @@ int main(){
     }
 
   }
+
+
+    endtime2 = getrusage_sec();
+
+    printf("Calculation time is %lf\n",endtime2-starttime2);
 
 
     fp2=fopen("iffta-1d.txt","w");

@@ -6,10 +6,6 @@
 #include <fftw3.h>
 #include <complex.h>
 
-#define WID 4096
-#define HEI 4096
-
-
 double getrusage_sec()
 {
     struct rusage t;
@@ -32,6 +28,8 @@ int main(){
     FILE *fp1;
     FILE *fp2;
     int i,j,k;
+    int WID,HEI;
+    char filename[20] = {};
 
 
     fftw_plan plan;
@@ -39,8 +37,17 @@ int main(){
 
     double f;
 
+    printf("please input a number of width  :  ");
+    scanf("%d",&WID);
 
-    fp=fopen("data2000.txt","r");
+    printf("please input a number of heith  :  ");
+    scanf("%d",&HEI);
+
+    printf("please input a filename  :  ");
+    scanf("%s",filename);
+
+
+    fp=fopen(filename,"r");
     if(fp==NULL){
       printf("file open error¥n");
     }
@@ -54,7 +61,6 @@ int main(){
          printf("file read error\n");
        }
         ibuf[i][0] = f;
-        //printf("%lf\n",ibuf[i][0]);
         ibuf[i][1] = 0.0;
     }
     fclose(fp);

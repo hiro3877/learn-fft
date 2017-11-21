@@ -140,8 +140,8 @@ N=1 << M;
 for (i=0;i<N;i++){
 	for (j=0;j<N;j++){
 	
-		if(i<2 && j<3) Fr[i][j]=1;Fi[i][j]=0; 
-		if(i>=2 || j>=3) Fr[i][j]=0;Fi[i][j]=0; 
+		if(i<3 && j<2) Fr[i][j]=1;Fi[i][j]=0; 
+		if(i>=3 || j>=2) Fr[i][j]=0;Fi[i][j]=0; 
 		
 	}
 }
@@ -156,7 +156,7 @@ if(N>128){
   exit(1);
 }
 
-  S=0;//S=0 FFT S=0 iFFT
+  S=0;//S=0 FFT S!=0 iFFT
 
   /*for(i=0;i<N;i++){
 	printf("%lf   %lf   %lf   %lf\n",Fr[0][i],Fr[1][i],Fr[2][i],Fr[3][i]);

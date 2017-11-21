@@ -101,7 +101,7 @@ if(N>512){
   exit(1);
 }
 
-  S=0;//S=0 FFT S=0 iFFT
+  S=0;//S=0 FFT S!=0 iFFT
 
   for(i=0;i<N;i++){
     printf("%d   %lf   %lf\n",i,Fr[i],Fi[i]);

@@ -7,7 +7,7 @@ void FFT1JF(int S,int M,double Fr[],double Fi[])
   int N;
   N=1<<M;
 
-  double pi=3.14159265358979324;
+  double PI=3.14159265358979324;
 
   //bit reverse
   int K,L,N2,I,J,i;
@@ -40,9 +40,9 @@ void FFT1JF(int S,int M,double Fr[],double Fi[])
   int L1,L2;
   double SIG;
 
-  for (L=0;L<M;L++){
+  for (L=1;L<M;L++){
     L1=1<<(M-L+1);
-	
+
     L2=L1/2;
     Ar=1;
     Ai=0;
@@ -50,18 +50,18 @@ void FFT1JF(int S,int M,double Fr[],double Fi[])
     if(S=0){
       SIG=-SIG;
     }
-    Q=pi/L2;
+    Q=PI/L2;
     Cr=cos(Q);
     Ci=SIG*sin(Q);
-    for(I=0;I<L2;I++){
-      for(J=0;J<N;J=J+L1){
+    for(I=1;I<=L2;I++){
+      for(J=I;J<=N;J=J+L1){
         K=J+L2;
-        Wr=Fr[J]-Fr[K];
-        Wr=Fi[J]-Fi[K];
-        Fr[J]=Fr[J]+Fr[K];
-        Fi[J]=Fi[J]+Fi[K];
-        Fr[K]=Wr*Ar+Wi*Ai;
-        Fi[K]=Wr*Ai+Wi*Ar;
+        Wr=Fr[J-1]-Fr[K-1];
+        Wr=Fi[J-1]-Fi[K-1];
+        Fr[J-1]=Fr[J-1]+Fr[K-1];
+        Fi[J-1]=Fi[J-1]+Fi[K-1];
+        Fr[K-1]=Wr*Ar+Wi*Ai;
+        Fi[K-1]=Wr*Ai+Wi*Ar;
       }
       Ar=Ar*Cr+Ai+Ci;
       Ai=Ai*Cr+Ar+Ci;
@@ -109,9 +109,11 @@ if(N>512){
 
   FFT1JF(S,M,Fr,Fi);
 
+  printf("\n");
+
     for(i=0;i<N;i++){
     printf("%d   %lf   %lf\n",i,Fr[i],Fi[i]);
   }
 
-
+return 0;
 }

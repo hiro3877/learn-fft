@@ -13,9 +13,6 @@ void FFT1JT(int S,int M,double Fr[],double Fi[])
   int K,L,N2,I,J;
   double Ar,Ai,Cr,Ci,Wr,Wi;
   double Q;
-  double tmp_A;
-
-  int JL;
 
   N2=N/2;
 
@@ -43,36 +40,30 @@ void FFT1JT(int S,int M,double Fr[],double Fi[])
   int L1,L2;
   double SIG;
 
-  for (L=1;L<=M;L++){
-    L1=1<<L;
+  for (L=0;L<M;L++){
+    L1=1<<(L+1);
     L2=L1/2;
     Ar=1.0;
     Ai=0.0;
     SIG=1.0;
-    if(S==0){
+    if(S=0){
       SIG=-SIG;
     }
     Q=PI/L2;
     Cr=cos(Q);
     Ci=SIG*sin(Q);
     for(I=0;I<L2;I++){
-      for(J=I;J<=N-1;J+=L1){
-        K=J+L2;
-        Wr=Fr[K]*Ar-Fi[K]*Ai;
+      for(J=I;J<N-1;J=J+L1){
+        K=(J+1)+L2;
+        Wr=Fr[K]*Ar+Fi[K]*Ai;
         Wi=Fi[K]*Ar+Fr[K]*Ai;
         Fr[K]=Fr[J]-Wr;
         Fi[K]=Fi[J]-Wi;
         Fr[J]=Fr[J]+Wr;
         Fi[J]=Fi[J]+Wi;
-        /*printf("Fr[K]=Fr[%d]=%lf,Fi[K]=Fi[%d]=%lf\n",K,Fr[K],K,Fi[K]);
-        printf("Fr[J]=Fr[%d]=%lf,Fi[J]=Fi[%d]=%lf\n",J,Fr[J],J,Fi[J]);
-        printf("\n");*/
       }
-      //printf("Ar=%lf   Ai=%lf\n",Ar,Ai);
-      tmp_A=Ar;
-      Ar=Ar*Cr-Ai*Ci;
-      Ai=Ai*Cr+tmp_A*Ci;
-      //printf("Ar=%lf   Ai=%lf\n",Ar,Ai);
+      Ar=Ar*Cr+Ai+Ci;
+      Ai=Ai*Cr+Ar+Ci;
     }
   }
 

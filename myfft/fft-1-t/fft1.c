@@ -129,6 +129,9 @@ void fftt(int m,int n,double xr[],double xi[],int iv)
         xi[ip]=xi[i]-ti;
         xr[i]=xr[i]+tr;
         xi[i]=xi[i]+ti;
+        printf("Fr[K]=Fr[%d]=%lf,Fi[K]=Fi[%d]=%lf\n",ip,xr[ip],ip,xi[ip]);
+        printf("Fr[J]=Fr[%d]=%lf,Fi[J]=Fi[%d]=%lf\n",i,xr[i],i,xi[i]);
+        printf("\n");
       }
     }
     p=pp;

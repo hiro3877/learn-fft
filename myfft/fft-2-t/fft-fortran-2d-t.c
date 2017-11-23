@@ -2,7 +2,24 @@
 #include <stdlib.h>
 #include <math.h>
 
-void FFT2JT(int S,int M,double Fr[][128],double Fi[][128])
+#include <sys/time.h>
+#include <sys/resource.h>
+
+#define N_DATA 512
+
+double getrusage_sec()
+{
+    struct rusage t;
+    struct timeval tv;
+
+    getrusage(RUSAGE_SELF,&t);
+    tv = t.ru_utime;
+
+    return tv.tv_sec + (double)tv.tv_usec*1e-6;
+}
+
+
+void FFT2JT(int S,int M,double Fr[][N_DATA],double Fi[][N_DATA])
 {
   int N;
   N=1<<M;
@@ -23,7 +40,7 @@ void FFT2JT(int S,int M,double Fr[][128],double Fi[][128])
 
   double Cr,Ci,S1r,S1i,S3r,S3i,S5r,S5i,S7r,S7i,Tr,Ti;
   double Q;
-  double Xr[128],Xi[128];
+  double Xr[N_DATA],Xi[N_DATA];
 
   int IR,I1,I2,I3,I4;
   int JR,J1,J2;
@@ -129,28 +146,57 @@ void FFT2JT(int S,int M,double Fr[][128],double Fi[][128])
 int main()
 {
 
-double Fr[128][128],Fi[128][128];
+double Fr[N_DATA][N_DATA],Fi[N_DATA][N_DATA];
 int T,S,N;
-int M=2;
+int M=log2(N_DATA);
 int i,j;
+
+FILE *fp;
+FILE *fp1;
+
+double f;
+double starttime1,endtime1;
+double starttime2,endtime2;
+
+char filename[20] = {};
 
 N=1 << M;
 
+printf("please input a filename  :  ");
+scanf("%s",filename);
+
+fp=fopen(filename,"r");
+if(fp==NULL){
+  printf("file open error¥n");
+}
+
 for (i=0;i<N;i++){
+  for (j=0;j<N;j++){
+
+    if (fscanf(fp, "%lf", &f) != 1){
+     printf("file read error\n");
+   }
+    Fr[i][j] = f;
+    Fi[i][j] = 0.0;
+  }
+}
+fclose(fp);
+
+/*for (i=0;i<N;i++){
 	for (j=0;j<N;j++){
 
 		if(i<3 && j<2) Fr[i][j]=1;Fi[i][j]=0;
 		if(i>=3 || j>=2) Fr[i][j]=0;Fi[i][j]=0;
 
 	}
-}
+}*/
 
 printf("FFT start\n");
 printf("number of data N*N N=%d\n",N);
 
 
 
-if(N>128){
+if(N>N_DATA){
   printf("M is too large\n");
   exit(1);
 }
@@ -161,21 +207,39 @@ if(N>128){
 	printf("%lf   %lf   %lf   %lf\n",Fr[0][i],Fr[1][i],Fr[2][i],Fr[3][i]);
   }*/
 
-  for(i=0;i<N;i++){
+  /*for(i=0;i<N;i++){
     for(j=0;j<N;j++){
 		printf("%d  %d    %lf    %lf\n",i,j,Fr[i][j],Fi[i][j]);
 	}
-  }
+}*/
+
+  starttime1 = getrusage_sec();
 
   FFT2JT(S,M,Fr,Fi);
 
+  endtime1 = getrusage_sec();
+
   printf("\n");
 
-    for(i=0;i<N;i++){
+    /*for(i=0;i<N;i++){
     for(j=0;j<N;j++){
 		printf("%d  %d    %lf    %lf\n",i,j,Fr[i][j],Fi[i][j]);
 	}
+}*/
+
+fp1=fopen("fft-2d.txt","w");
+if(fp1==NULL){
+  printf("file open error\n");
+}
+
+for (i=0;i<N;i++){
+  for (j=0;j<N;j++){
+    fprintf(fp1,"%lf, %lf\n",Fr[i][j],Fi[i][j]);
   }
+}
+fclose(fp1);
+
+  printf("Calculation time is %lf\n",endtime1-starttime1);
 
 
 }

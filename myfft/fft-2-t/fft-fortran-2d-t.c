@@ -5,7 +5,9 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
-#define N_DATA 512
+#define N 128
+
+double Fr[N][N],Fi[N][N];
 
 double getrusage_sec()
 {
@@ -19,10 +21,8 @@ double getrusage_sec()
 }
 
 
-void FFT2JT(int S,int M,double Fr[][N_DATA],double Fi[][N_DATA])
+void FFT2JT(int S,int M,double Fr[][N],double Fi[][N])
 {
-  int N;
-  N=1<<M;
 
   int i,j;
 
@@ -40,7 +40,7 @@ void FFT2JT(int S,int M,double Fr[][N_DATA],double Fi[][N_DATA])
 
   double Cr,Ci,S1r,S1i,S3r,S3i,S5r,S5i,S7r,S7i,Tr,Ti;
   double Q;
-  double Xr[N_DATA],Xi[N_DATA];
+  double Xr[N],Xi[N];
 
   int IR,I1,I2,I3,I4;
   int JR,J1,J2;
@@ -146,9 +146,8 @@ void FFT2JT(int S,int M,double Fr[][N_DATA],double Fi[][N_DATA])
 int main()
 {
 
-double Fr[N_DATA][N_DATA],Fi[N_DATA][N_DATA];
-int T,S,N;
-int M=log2(N_DATA);
+int T,S;
+int M=log2(N);
 int i,j;
 
 FILE *fp;
@@ -159,8 +158,6 @@ double starttime1,endtime1;
 double starttime2,endtime2;
 
 char filename[20] = {};
-
-N=1 << M;
 
 printf("please input a filename  :  ");
 scanf("%s",filename);
@@ -193,13 +190,6 @@ fclose(fp);
 
 printf("FFT start\n");
 printf("number of data N*N N=%d\n",N);
-
-
-
-if(N>N_DATA){
-  printf("M is too large\n");
-  exit(1);
-}
 
   S=0;//S=0 FFT S!=0 iFFT
 

@@ -33,7 +33,6 @@
 
 # add
 *.bmp
-*.txt
 *.bin
 *.dat
 *.swp

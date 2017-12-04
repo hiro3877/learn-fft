@@ -5,7 +5,7 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
-#define N 128
+#define N 1024
 
 double Fr[N][N],Fi[N][N];
 
@@ -71,14 +71,14 @@ void FFT2JT(int S,int M,double Fr[][N],double Fi[][N])
 				  Fr[K-1][K2-1]=Tr;
 				  Fi[K-1][K2-1]=Ti;
 			  }
-			  for (K=1;K<=N;K++){
-				  Tr=Fr[K1-1][K-1];
-				  Ti=Fi[K1-1][K-1];
-				  Fr[K1-1][K-1]=Fr[K2-1][K-1];
-				  Fi[K1-1][K-1]=Fi[K2-1][K-1];
-				  Fr[K2-1][K-1]=Tr;
-				  Fi[K2-1][K-1]=Ti;
-			  }
+        for (K=1;K<=N;K++){
+          Tr=Fr[K1-1][K-1];
+          Ti=Fi[K1-1][K-1];
+          Fr[K1-1][K-1]=Fr[K2-1][K-1];
+          Fi[K1-1][K-1]=Fi[K2-1][K-1];
+          Fr[K2-1][K-1]=Tr;
+          Fi[K2-1][K-1]=Ti;
+        }
 		  }
 	  }
   }
@@ -141,6 +141,14 @@ void FFT2JT(int S,int M,double Fr[][N],double Fi[][N])
 	  }
   }
 
+  if(S!=0){
+    for(I=1;I<=N;I++){
+      for(J=1;J<=N;J++){
+        Fr[I-1][J-1]=Fr[I-1][J-1]/(N*N);
+      }
+    }
+  }
+
 }
 
 int main()
@@ -152,8 +160,9 @@ int i,j;
 
 FILE *fp;
 FILE *fp1;
+FILE *fp2;
 
-double f;
+double f,g;
 double starttime1,endtime1;
 double starttime2,endtime2;
 
@@ -228,6 +237,28 @@ for (i=0;i<N;i++){
   }
 }
 fclose(fp1);
+
+
+S=1;
+
+FFT2JT(S,M,Fr,Fi);
+
+fp2=fopen("ifft-2d.txt","w");
+if(fp2==NULL){
+  printf("file open error\n");
+}
+
+for (i=0;i<N;i++){
+  for (j=0;j<N;j++){
+    fprintf(fp2,"%lf, %lf\n",Fr[i][j],Fi[i][j]);
+  }
+}
+fclose(fp2);
+
+
+
+
+
 
   printf("Calculation time is %lf\n",endtime1-starttime1);
 

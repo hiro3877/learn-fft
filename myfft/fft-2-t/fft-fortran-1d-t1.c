@@ -5,7 +5,7 @@
 #include <sys/time.h>
 #include <sys/resource.h>
 
-#define N 128
+#define N 1024
 
 double Fr[N][N],Fi[N][N];
 
@@ -141,6 +141,7 @@ char filename[20] = {};
 
 FILE *fp;
 FILE *fp1;
+FILE *fp2;
 
 double f;
 double starttime1,endtime1;
@@ -202,6 +203,27 @@ printf("number of bit M=%d\n",M);
     }
   }
   fclose(fp1);
+
+
+
+  S=1;
+
+  FFT2JS(S,M,Fr,Fi);
+
+  fp2=fopen("ifft-1d.txt","w");
+  if(fp2==NULL){
+    printf("file open error\n");
+  }
+
+  for (i=0;i<N;i++){
+    for (j=0;j<N;j++){
+      fprintf(fp2,"%lf, %lf\n",Fr[i][j],Fi[i][j]);
+    }
+  }
+  fclose(fp2);
+
+
+
 
   printf("Calculation time is %lf\n",endtime1-starttime1);
 

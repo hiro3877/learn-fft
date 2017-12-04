@@ -71,7 +71,7 @@ int main(){
 
     plan = fftw_plan_dft_2d(HEI,WID, ibuf, obuf, FFTW_FORWARD, FFTW_ESTIMATE);
     fftw_execute(plan);
-    fftw_destroy_plan(plan);
+    fftw_destroy_plan(plan);	
 
     endtime1 = getrusage_sec();
 
@@ -98,6 +98,12 @@ int main(){
     plan = fftw_plan_dft_2d(HEI,WID, obuf, ibuf, FFTW_BACKWARD, FFTW_ESTIMATE);
     fftw_execute(plan);
     fftw_destroy_plan(plan);
+
+    for(k=0;k<2;k++){
+    	for(i=0;i<WID*HEI;i++){
+    		ibuf[i][k]=ibuf[i][k]/(WID*HEI);
+    	}
+    }
 
     endtime2 = getrusage_sec();
 

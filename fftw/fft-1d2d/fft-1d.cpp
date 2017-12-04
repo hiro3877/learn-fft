@@ -199,8 +199,8 @@ int main(){
 
     for(i=0;i<HEI;i++){
       for(j=i;j<WID;j++){
-        tmp=ibuf[i*WID+j][k];
-        ibuf[i*WID+j][k]=ibuf[j*WID+i][k];
+        tmp=ibuf[i*WID+j][k]/(WID*HEI);
+        ibuf[i*WID+j][k]=ibuf[j*WID+i][k]/(WID*HEI);
         ibuf[j*WID+i][k]=tmp;
       }
     }

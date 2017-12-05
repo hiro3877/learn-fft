@@ -208,7 +208,11 @@ fclose(fp1);
 
 S=1;
 
+starttime2=get_time();
+
 FFT2JT(S,M,Fr,Fi);
+
+endtime2=get_time();
 
 fp2=fopen("ifft-2d.txt","w");
 if(fp2==NULL){
@@ -224,7 +228,7 @@ fclose(fp2);
 
 printf("FFT Calculation time is %lf\n",endtime1-starttime1);
 
-//printf("IFFT Calculation time is %lf\n",endtime2-starttime2);
+printf("IFFT Calculation time is %lf\n",endtime2-starttime2);
 
 
 }

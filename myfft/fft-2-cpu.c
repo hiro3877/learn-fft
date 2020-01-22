@@ -4,41 +4,38 @@
 
 #include <sys/time.h>
 
-#define N 256
+#define N 8
+#define M 3
+#define M2 1
 
 double Fr[N][N],Fi[N][N];
 
 
-double get_time(void)
- {
- struct timeval tv;
- gettimeofday(&tv, NULL);
- //ミリ秒を計算
-return ((double)(tv.tv_sec)*1000 + (double)(tv.tv_usec)*0.001);
- }
-
-
-void FFT2JT(int S,int M,double Fr[][N],double Fi[][N])
+void FFT2JT(double Fr[N][N],double Fi[N][N])
 {
+	
+	struct timeval s, e;
 
-  int i,j;
+  char i,j;
 
   double P=6.283185307179584/N;
 
   //bit reverse
-  int K,L,M2,I,J;
+  char K,L,I,J;
 
   double Cr,Ci,S1r,S1i,S3r,S3i,S5r,S5i,S7r,S7i,Tr,Ti;
   double Q;
   double Xr[N],Xi[N];
 
-  int IR,I1,I2,I3,I4;
-  int JR,J1,J2;
-  int KF,K1,K2,K3,K4;
-  int IP,JP,IM,KI;
-  int JM,KJ,KK;
-
-  M2=M/2;
+  char IR,I1,I2,I3,I4;
+  char JR,J1,J2;
+  char KF,K1,K2,K3,K4;
+  char IP,JP,IM,KI;
+  char JM,KJ,KK;
+  
+  gettimeofday(&s, NULL);
+  
+  for(i=0;i<100;i++){
 
   for (L=0;L<M2;L++){
 	  I1=1<<L;
@@ -72,15 +69,14 @@ void FFT2JT(int S,int M,double Fr[][N],double Fi[][N])
 		  }
 	  }
   }
+ 
 
 
   //DFT
 
-  int L1,L2;
-  double SIG;
+  char L1,L2;
+  char SIG=-1;
 
-  SIG=1.0;
-  if(S==0) SIG=-SIG;
   Cr=cos(P);
   Ci=SIG*sin(P);
   Xr[0]=1;
@@ -130,104 +126,65 @@ void FFT2JT(int S,int M,double Fr[][N],double Fi[][N])
 		  }
 	  }
   }
-
-  if(S!=0){
-    for(I=0;I<N;I++){
-      for(J=0;J<N;J++){
-        Fr[I][J]=Fr[I][J]/(N*N);
-      }
-    }
+  
   }
-
+  
+  gettimeofday(&e, NULL);
+  printf("time = %lf\n", (e.tv_sec - s.tv_sec) + (e.tv_usec - s.tv_usec)*1.0E-6);
+  
+  
 }
+
+
 
 int main()
 {
+	
+	
 
-int T,S;
-int M=log2(N);
-int i,j;
+char T;
+char i,j;
 
-FILE *fp;
-FILE *fp1;
-FILE *fp2;
-
-double f,g;
-double starttime1,endtime1;
-double starttime2,endtime2;
-
-char filename[20] = {};
-
-printf("please input a filename  :  ");
-scanf("%s",filename);
-
-fp=fopen(filename,"r");
-if(fp==NULL){
-  printf("file open error¥n");
-}
 
 for (i=0;i<N;i++){
-  for (j=0;j<N;j++){
+	for (j=0;j<N;j++){
 
-    if (fscanf(fp, "%lf", &f) != 1){
-     printf("file read error\n");
-   }
-    Fr[i][j] = f;
-    Fi[i][j] = 0.0;
-  }
+		if(i<3 && j<2) Fr[i][j]=1.0;Fi[i][j]=0.0;
+		if(i>=3 || j>=2) Fr[i][j]=0.0;Fi[i][j]=0.0;
+	}
 }
-fclose(fp);
 
 
 printf("FFT start\n");
 printf("number of data N*N N=%d\n",N);
 
-  S=0;//S=0 FFT S!=0 IFFT
+  //S=0 FFT S!=0 IFFT
+
+/*for (i=0;i<N;i++){
+	for (j=0;j<N;j++){
+  	  printf("%d %d   %lf %lf\n",i,j,Fr[i][j],Fi[i][j]);
+    }
+  }*/
+  
+  
+  
+
+  FFT2JT(Fr,Fi);
+  
+  
+  
 
 
-  starttime1=get_time();
-
-  FFT2JT(S,M,Fr,Fi);
-
-  endtime1=get_time();
-
-
-fp1=fopen("fft-2d.txt","w");
-if(fp1==NULL){
-  printf("file open error\n");
+/*for (i=0;i<N;i++){
+	for (j=0;j<N;j++){
+  	  printf("%d %d   %lf %lf\n",i,j,Fr[i][j],Fi[i][j]);
+    }
+  }*/
+  
+  
+  
+    return 0;
+	
+	
 }
 
-for (i=0;i<N;i++){
-  for (j=0;j<N;j++){
-    fprintf(fp1,"%lf, %lf\n",Fr[i][j],Fi[i][j]);
-  }
-}
-fclose(fp1);
-
-
-S=1;
-
-starttime2=get_time();
-
-FFT2JT(S,M,Fr,Fi);
-
-endtime2=get_time();
-
-fp2=fopen("ifft-2d.txt","w");
-if(fp2==NULL){
-  printf("file open error\n");
-}
-
-for (i=0;i<N;i++){
-  for (j=0;j<N;j++){
-    fprintf(fp2,"%lf, %lf\n",Fr[i][j],Fi[i][j]);
-  }
-}
-fclose(fp2);
-
-printf("FFT Calculation time is %lf\n",endtime1-starttime1);
-
-printf("IFFT Calculation time is %lf\n",endtime2-starttime2);
-
-
-}

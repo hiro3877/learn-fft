@@ -4,22 +4,23 @@
 
 #include <sys/time.h>
 
-#define N 256
+#define N 4
 
 double Fr[N][N],Fi[N][N];
-
 
 double get_time(void)
  {
  struct timeval tv;
  gettimeofday(&tv, NULL);
- //ãƒŸãƒªç§’ã‚’è¨ˆç®—
+ //ƒ~ƒŠ•b‚ðŒvŽZ
 return ((double)(tv.tv_sec)*1000 + (double)(tv.tv_usec)*0.001);
  }
 
 
-void FFT2JT(int S,int M,double Fr[][N],double Fi[][N])
+void FFT2JT(int S,int M,double Fr[N][N],double Fi[N][N])
 {
+#pragma HLS UNROLL
+#pragma HLS PIPELINE
 
   int i,j;
 
@@ -38,22 +39,20 @@ void FFT2JT(int S,int M,double Fr[][N],double Fi[][N])
   int IP,JP,IM,KI;
   int JM,KJ,KK;
 
-  M2=M/2;
+  M2=1;
 
-  for (L=0;L<M2;L++){
-	  I1=1<<L;
-	  I2=N/I1;
-	  I3=I2/2;
-	  I4=I3/2;
-	  for(I=0;I<I1;I++){
-		  JR=I*I2;
-		  J1=JR+I1;
-		  J2=JR+I3;
-		  for (J=0;J<I4;J++){
-			  KF=(J/I1)*I1+J;
-			  K1=KF+J1;
-			  K2=KF+J2;
-			  for (K=0;K<N;K++){
+	  I1=1;
+	  I2=4;
+	  I3=2;
+	  I4=1;
+
+		  JR=0;
+		  J1=1;
+		  J2=2;
+			  KF=0;
+			  K1=1;
+			  K2=2;
+			  for (K=0;K<4;K++){
 				  Tr=Fr[K][K1];
 				  Ti=Fi[K][K1];
 				  Fr[K][K1]=Fr[K][K2];
@@ -61,7 +60,7 @@ void FFT2JT(int S,int M,double Fr[][N],double Fi[][N])
 				  Fr[K][K2]=Tr;
 				  Fi[K][K2]=Ti;
 			  }
-        for (K=0;K<N;K++){
+        for (K=0;K<4;K++){
           Tr=Fr[K1][K];
           Ti=Fi[K1][K];
           Fr[K1][K]=Fr[K2][K];
@@ -69,9 +68,6 @@ void FFT2JT(int S,int M,double Fr[][N],double Fi[][N])
           Fr[K2][K]=Tr;
           Fi[K2][K]=Ti;
         }
-		  }
-	  }
-  }
 
 
   //DFT
@@ -86,13 +82,13 @@ void FFT2JT(int S,int M,double Fr[][N],double Fi[][N])
   Xr[0]=1;
   Xi[0]=0;
 
-  for(I=0;I<N-1;I++){
+  for(I=0;I<3;I++){
 	  Xr[I+1]=Xr[I]*Cr-Xi[I]*Ci;
 	  Xi[I+1]=Xr[I]*Ci+Xi[I]*Cr;
   }
 
-  for(L=0;L<M;L++){
-	  K1=1<<(M-L);
+  for(L=0;L<2;L++){
+	  K1=1<<(2-L);
 	  K2=K1/2;
 	  K3=N/K1;
 	  K4=K3*2;
@@ -138,96 +134,56 @@ void FFT2JT(int S,int M,double Fr[][N],double Fi[][N])
       }
     }
   }
-
-}
+  }
 
 int main()
 {
-
-int T,S;
-int M=log2(N);
-int i,j;
-
-FILE *fp;
-FILE *fp1;
-FILE *fp2;
-
-double f,g;
+	
 double starttime1,endtime1;
-double starttime2,endtime2;
 
-char filename[20] = {};
-
-printf("please input a filename  :  ");
-scanf("%s",filename);
-
-fp=fopen(filename,"r");
-if(fp==NULL){
-  printf("file open errorÂ¥n");
-}
+int S;
+int M=2;
+int i,j;
 
 for (i=0;i<N;i++){
   for (j=0;j<N;j++){
 
-    if (fscanf(fp, "%lf", &f) != 1){
-     printf("file read error\n");
-   }
-    Fr[i][j] = f;
+    Fr[i][j] = 1.0;
     Fi[i][j] = 0.0;
   }
 }
-fclose(fp);
+
+for (i=0;i<N;i++){
+  for (j=0;j<N;j++){
+	  printf("%d %d   %lf %lf\n",i,j,Fr[i][j],Fi[i][j]);
+  }
+}
 
 
 printf("FFT start\n");
 printf("number of data N*N N=%d\n",N);
 
+
   S=0;//S=0 FFT S!=0 IFFT
 
-
   starttime1=get_time();
-
+  
+  for(i=0;i<1000000;i++){
+  
   FFT2JT(S,M,Fr,Fi);
-
+  
+  }
+  
   endtime1=get_time();
 
 
-fp1=fopen("fft-2d.txt","w");
-if(fp1==NULL){
-  printf("file open error\n");
-}
-
-for (i=0;i<N;i++){
-  for (j=0;j<N;j++){
-    fprintf(fp1,"%lf, %lf\n",Fr[i][j],Fi[i][j]);
+  for (i=0;i<N;i++){
+    for (j=0;j<N;j++){
+  	  printf("%d %d   %lf %lf\n",i,j,Fr[i][j],Fi[i][j]);
+    }
   }
-}
-fclose(fp1);
-
-
-S=1;
-
-starttime2=get_time();
-
-FFT2JT(S,M,Fr,Fi);
-
-endtime2=get_time();
-
-fp2=fopen("ifft-2d.txt","w");
-if(fp2==NULL){
-  printf("file open error\n");
+  
+  printf("FFT Calculation time is %lf\n",endtime1-starttime1);
 }
 
-for (i=0;i<N;i++){
-  for (j=0;j<N;j++){
-    fprintf(fp2,"%lf, %lf\n",Fr[i][j],Fi[i][j]);
-  }
-}
-fclose(fp2);
 
-printf("FFT Calculation time is %lf\n",endtime1-starttime1);
-
-printf("IFFT Calculation time is %lf\n",endtime2-starttime2);
-
-
-}

@@ -2,23 +2,12 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include <sys/time.h>
-
-#define N 256
+#define N 16
 
 double Fr[N][N],Fi[N][N];
 
 
-double get_time(void)
- {
- struct timeval tv;
- gettimeofday(&tv, NULL);
- //ミリ秒を計算
-return ((double)(tv.tv_sec)*1000 + (double)(tv.tv_usec)*0.001);
- }
-
-
-void FFT2JT(int S,int M,double Fr[][N],double Fi[][N])
+void FFT2JT(int S,int M,double Fr[N][N],double Fi[N][N])
 {
 
   int i,j;
@@ -145,38 +134,18 @@ int main()
 {
 
 int T,S;
-int M=log2(N);
+int M=4;
 int i,j;
 
-FILE *fp;
-FILE *fp1;
-FILE *fp2;
-
-double f,g;
-double starttime1,endtime1;
-double starttime2,endtime2;
-
-char filename[20] = {};
-
-printf("please input a filename  :  ");
-scanf("%s",filename);
-
-fp=fopen(filename,"r");
-if(fp==NULL){
-  printf("file open error¥n");
-}
 
 for (i=0;i<N;i++){
-  for (j=0;j<N;j++){
+	for (j=0;j<N;j++){
 
-    if (fscanf(fp, "%lf", &f) != 1){
-     printf("file read error\n");
-   }
-    Fr[i][j] = f;
-    Fi[i][j] = 0.0;
-  }
+		if(i<3 && j<2) Fr[i][j]=1.0;Fi[i][j]=0.0;
+		if(i>=3 || j>=2) Fr[i][j]=0.0;Fi[i][j]=0.0;
+
+	}
 }
-fclose(fp);
 
 
 printf("FFT start\n");
@@ -184,50 +153,18 @@ printf("number of data N*N N=%d\n",N);
 
   S=0;//S=0 FFT S!=0 IFFT
 
-
-  starttime1=get_time();
+for (i=0;i<N;i++){
+	for (j=0;j<N;j++){
+  	  printf("%d %d   %lf %lf\n",i,j,Fr[i][j],Fi[i][j]);
+    }
+  }
 
   FFT2JT(S,M,Fr,Fi);
 
-  endtime1=get_time();
-
-
-fp1=fopen("fft-2d.txt","w");
-if(fp1==NULL){
-  printf("file open error\n");
-}
 
 for (i=0;i<N;i++){
-  for (j=0;j<N;j++){
-    fprintf(fp1,"%lf, %lf\n",Fr[i][j],Fi[i][j]);
+	for (j=0;j<N;j++){
+  	  printf("%d %d   %lf %lf\n",i,j,Fr[i][j],Fi[i][j]);
+    }
   }
-}
-fclose(fp1);
-
-
-S=1;
-
-starttime2=get_time();
-
-FFT2JT(S,M,Fr,Fi);
-
-endtime2=get_time();
-
-fp2=fopen("ifft-2d.txt","w");
-if(fp2==NULL){
-  printf("file open error\n");
-}
-
-for (i=0;i<N;i++){
-  for (j=0;j<N;j++){
-    fprintf(fp2,"%lf, %lf\n",Fr[i][j],Fi[i][j]);
-  }
-}
-fclose(fp2);
-
-printf("FFT Calculation time is %lf\n",endtime1-starttime1);
-
-printf("IFFT Calculation time is %lf\n",endtime2-starttime2);
-
-
 }
